@@ -1,8 +1,8 @@
 name: hello_subflow
 on:
   schedule:
-    - cron: '42 * * * *'
-
+    - cron: '* 23 * * *'
+    
 jobs:
   run:
     runs-on: ubuntu-latest
