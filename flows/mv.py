@@ -86,6 +86,7 @@ def refresh_bfree():
     
 if __name__ == "__main__":
     refresh_bfree()
+    
     # refresh_bfree.serve(
     #     name="bfree-deployment",
     #     cron="5 * * * *",
