@@ -1,7 +1,7 @@
 name: healthcheck
 on:
   schedule:
-    - cron: '* 23 * * *'
+    - cron: '0 5 * * 3'
 
 jobs:
   run:
