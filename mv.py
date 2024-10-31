@@ -12,18 +12,6 @@ async def get_secrets():
     host = await Secret.load("prod-whs-host")
     return pw.get(), host.get()
 
-# @task
-# async def load_secrets():
-#     """
-#     Load secrets from prefect block
-#     """
-#     prod_whs_pw = await Secret.load("prod-warehouse-password")
-#     prod_whs_host = await Secret.load("prod-warehouse-host")
-#     prod_instafin_key_id = await Secret.load("prod-instafin-key-id")
-#     prod_instafin_key_secret = await Secret.load("prod-instafin-key-secret")
-#     return prod_whs_pw.get(), prod_whs_host.get(), prod_instafin_key_id.get(), prod_instafin_key_secret.get()
-
-
 @task
 def connect(pw, host):
     """Connect to the PostgreSQL database server"""
