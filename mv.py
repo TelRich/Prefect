@@ -1,3 +1,4 @@
+import asyncio
 from prefect import task, flow
 from prefect import get_run_logger
 import psycopg2
@@ -5,12 +6,14 @@ from psycopg2 import OperationalError
 import time
 from prefect.blocks.system import Secret
 
-# Load secrets
-pw = Secret.load("db-pw").get()
-host = Secret.load("host").get()
+@task
+async def get_secrets():
+    pw = await Secret.load("db-pw").get()
+    host = await Secret.load("host").get()
+    return pw, host
 
 @task
-def connect():
+def connect(pw, host):
     """Connect to the PostgreSQL database server"""
     try:
         logger = get_run_logger()
@@ -37,12 +40,14 @@ def close_connection(conn, cur):
         conn.close()
 
 @flow
-def refresh_bfree():
+async def refresh_bfree():
     logger = get_run_logger()
     logger.info('Refreshing BFREE Materialized View... Please hold on...')
     start_time = time.time()
     
-    conn, cur = connect()
+    pw, host = await get_secrets()
+    conn, cur = connect(pw, host)
+    
     if conn and cur:
         try:
             query = "REFRESH MATERIALIZED VIEW bi.bfree"
@@ -57,4 +62,4 @@ def refresh_bfree():
     logger.info(f"Execution time: {duration} minutes")
 
 if __name__ == "__main__":
-    refresh_bfree()
+    asyncio.run(refresh_bfree())
