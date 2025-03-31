@@ -2,6 +2,16 @@
 # configuration for deploying your flows. We recommend committing this file to source
 # control along with your flow code.
 
+# pull section allows you to provide instructions for cloning this project in remote locations
+# pull:
+# - prefect.deployments.steps.git_clone:
+#     repository: https://github.com/TelRich/MyPrefect.git
+#     branch: main
+#     access_token: '{{ prefect.blocks.secret.deployment-testing-hello-world-repo-token
+#       }}'
+# - prefect.deployments.steps.pip_install_requirements:
+#     requirements_file: requirements.txt
+
 # Generic metadata about this project
 name: Prefect
 prefect-version: 3.2.15
@@ -17,6 +27,8 @@ pull:
 - prefect.deployments.steps.git_clone:
     repository: https://github.com/TelRich/Prefect.git
     branch: main
+- prefect.deployments.steps.pip_install_requirements:
+    requirements_file: requirements.txt
 
 # the deployments section allows you to provide configuration for deploying flows
 deployments:
