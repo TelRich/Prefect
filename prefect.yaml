@@ -1,0 +1,38 @@
+# Welcome to your prefect.yaml file! You can use this file for storing and managing
+# configuration for deploying your flows. We recommend committing this file to source
+# control along with your flow code.
+
+# Generic metadata about this project
+name: Prefect
+prefect-version: 3.2.15
+
+# build section allows you to manage and build docker images
+build: null
+
+# push section allows you to manage if and how this project is uploaded to remote locations
+push: null
+
+# pull section allows you to provide instructions for cloning this project in remote locations
+pull:
+- prefect.deployments.steps.git_clone:
+    repository: https://github.com/TelRich/Prefect.git
+    branch: main
+
+# the deployments section allows you to provide configuration for deploying flows
+deployments:
+- name: new_hello
+  version: null
+  tags: []
+  concurrency_limit: null
+  description: A simple flow that demonstrates basic Prefect functionality
+  entrypoint: hello_world.py:hello_flow
+  parameters: {}
+  work_pool:
+    name: managedprefect
+    work_queue_name: null
+    job_variables: {}
+  schedules:
+  - interval: 7200.0
+    anchor_date: '2025-03-31T01:25:19.103475+00:00'
+    timezone: UTC
+    active: true
