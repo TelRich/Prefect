@@ -14,11 +14,12 @@ push:
 
 # pull section allows you to provide instructions for cloning this project in remote locations
 pull:
-  - prefect.deployments.steps.git_clone:
-      repository: https://github.com/TelRich/Prefect.git
-      branch: main
-  - prefect.deployments.steps.pip_install_requirements:
-      requirements_file: requirements.txt
+    - prefect.deployments.steps.git_clone:
+        id: clone-step  # needed in order to be referenced in subsequent steps
+        repository: https://github.com/TelRich/Prefect.git
+    - prefect.deployments.steps.pip_install_requirements:
+        directory: {{ clone-step.directory }}  # `clone-step` is a user-provided `id` field
+        requirements_file: requirements.txt
 
 # the deployments section allows you to provide configuration for deploying flows
 deployments:
