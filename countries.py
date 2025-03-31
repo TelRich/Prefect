@@ -2,11 +2,24 @@
 from prefect import flow, task
 from sqlalchemy import create_engine, text
 from prefect.logging import get_run_logger
+from prefect.variables import Variable
+from prefect.blocks.system import Secret
+import asyncio
 
-DATABASE_URI = "postgresql://telrich:P4nfdzFyIMXoyhUJ1gRfN4B9XAJze1nd@dpg-cvkrr4je5dus73bt9oog-a.oregon-postgres.render.com/countries_k13u"
+# Load the database URI from a Prefect variable
+username = Variable.get("render_username")
+host = Variable.get("render_host")
+dbname = Variable.get("render_dbname")
+
+@task
+async def load_secret():
+    logger = get_run_logger()
+    password = await Secret.load("render-password")
+    logger.info("�� Password loaded from Secret Manager")
+    return password.get()
 
 @task(retries=3, retry_delay_seconds=5)
-def test_connection():
+def test_connection(DATABASE_URI):
     logger = get_run_logger()
     try:
         engine = create_engine(
@@ -21,7 +34,7 @@ def test_connection():
         return False
 
 @task(retries=2)
-def create_cities_table():
+def create_cities_table(DATABASE_URI):
     logger = get_run_logger()
     try:
         engine = create_engine(
@@ -45,7 +58,7 @@ def create_cities_table():
         raise
 
 @task(retries=2)
-def create_countries_table():
+def create_countries_table(DATABASE_URI):
     logger = get_run_logger()
     try:
         engine = create_engine(
@@ -75,15 +88,17 @@ def create_countries_table():
         raise
 
 @flow(name="Database Setup Flow")
-def main_flow():
+async def main_flow():
     logger = get_run_logger()
+    password = await load_secret()
+    DATABASE_URI = f"postgresql://{username}:{password}@{host}/{dbname}"
     logger.info("🚀 Starting database setup flow")
-    if test_connection():
-        create_cities_table()
-        create_countries_table()
+    if test_connection(DATABASE_URI):
+        create_cities_table(DATABASE_URI)
+        create_countries_table(DATABASE_URI)
         logger.info("✅ Database setup completed successfully!")
     else:
         logger.error("🛑 Aborting flow due to connection failure")
 
 if __name__ == "__main__":
-    main_flow()
+    asyncio.run(main_flow())
