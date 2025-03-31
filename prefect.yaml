@@ -17,10 +17,10 @@ name: Prefect
 prefect-version: 3.2.15
 
 # build section allows you to manage and build docker images
-build: null
+build:
 
 # push section allows you to manage if and how this project is uploaded to remote locations
-push: null
+push:
 
 # pull section allows you to provide instructions for cloning this project in remote locations
 pull:
@@ -33,18 +33,34 @@ pull:
 # the deployments section allows you to provide configuration for deploying flows
 deployments:
 - name: new_hello
-  version: null
+  version:
   tags: []
-  concurrency_limit: null
+  concurrency_limit:
   description: A simple flow that demonstrates basic Prefect functionality
   entrypoint: hello_world.py:hello_flow
   parameters: {}
   work_pool:
     name: managedprefect
-    work_queue_name: null
+    work_queue_name:
     job_variables: {}
   schedules:
   - interval: 7200.0
     anchor_date: '2025-03-31T01:25:19.103475+00:00'
+    timezone: UTC
+    active: true
+- name: countries_flow
+  version:
+  tags: []
+  concurrency_limit:
+  description:
+  entrypoint: countries.py:main_flow
+  parameters: {}
+  work_pool:
+    name: managedprefect
+    work_queue_name:
+    job_variables: {}
+  schedules:
+  - interval: 7200.0
+    anchor_date: '2025-03-31T01:43:11.831426+00:00'
     timezone: UTC
     active: true
