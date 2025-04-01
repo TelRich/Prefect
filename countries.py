@@ -23,11 +23,11 @@ async def load_secret():
     logger = get_run_logger()
     password = await Secret.load("render-password")
     username = await Variable.get("render_username")
-    # host = await Variable.get("render_host")
-    host = 'dpg-cvkrr4je5dus73bt9oog-a.oregon-postgres.render.com'
+    host = await Variable.get("render_host")
+    # host = 'dpg-cvkrr4je5dus73bt9oog-a.oregon-postgres.render.com'
     dbname = await Variable.get("render_dbname")
     logger.info("�� Password loaded from Secret Manager")
-    return password.get(), username.value, host, dbname
+    return password.get(), username.value, host.value, dbname.value
 
 # @task
 # async def load_secret():
