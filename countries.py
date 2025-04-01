@@ -7,16 +7,26 @@ from prefect.blocks.system import Secret
 import asyncio
 
 # Load the database URI from a Prefect variable
-username = Variable.get("render_username")
-host = Variable.get("render_host")
-dbname = Variable.get("render_dbname")
+# username = Variable.get("render_username")
+# host = Variable.get("render_host")
+# dbname = Variable.get("render_dbname")
+
+# @task
+# async def load_secret():
+#     logger = get_run_logger()
+#     password = await Secret.load("render-password")
+#     logger.info("�� Password loaded from Secret Manager")
+#     return password.get()
 
 @task
 async def load_secret():
     logger = get_run_logger()
     password = await Secret.load("render-password")
+    username = await Variable.get("render_username")
+    host = await Variable.get("render_host")
+    dbname = await Variable.get("render_dbname")
     logger.info("�� Password loaded from Secret Manager")
-    return password.get()
+    return password.get(), username, host, dbname
 
 @task(retries=3, retry_delay_seconds=5)
 def test_connection(DATABASE_URI):
@@ -90,7 +100,8 @@ def create_countries_table(DATABASE_URI):
 @flow(name="Database Setup Flow")
 async def main_flow():
     logger = get_run_logger()
-    password = await load_secret()
+    # password = await load_secret()
+    password, username, host, dbname= await load_secret()
     DATABASE_URI = f"postgresql://{username}:{password}@{host}/{dbname}"
     logger.info("🚀 Starting database setup flow")
     if test_connection(DATABASE_URI):
