@@ -27,7 +27,7 @@ async def load_secret():
     host = 'dpg-cvkrr4je5dus73bt9oog-a.oregon-postgres.render.com'
     dbname = await Variable.get("render_dbname")
     logger.info("�� Password loaded from Secret Manager")
-    return password.get(), username, host, dbname
+    return password.get(), username.value, host, dbname
 
 # @task
 # async def load_secret():
@@ -119,7 +119,7 @@ async def main_flow():
     logger = get_run_logger()
     # password = await load_secret()
     password, username, host, dbname= await load_secret()
-    DATABASE_URI = f"postgresql://{username}:{password}@{host}/{dbname}"
+    DATABASE_URI = f"postgresql://{username}:{password}@{host}/{dbname}?sslmode=require"
     logger.info("🚀 Starting database setup flow")
     if test_connection(DATABASE_URI):
         create_cities_table(DATABASE_URI)
