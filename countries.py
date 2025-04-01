@@ -18,15 +18,31 @@ import asyncio
 #     logger.info("�� Password loaded from Secret Manager")
 #     return password.get()
 
+# @task
+# async def load_secret():
+#     logger = get_run_logger()
+#     password = await Secret.load("render-password")
+#     username = await Variable.get("render_username")
+#     host = await Variable.get("render_host")
+#     dbname = await Variable.get("render_dbname")
+#     logger.info("�� Password loaded from Secret Manager")
+#     return password.get(), username, host, dbname
+
 @task
 async def load_secret():
     logger = get_run_logger()
+
+    # Secret (async)
     password = await Secret.load("render-password")
-    username = await Variable.get("render_username")
-    host = await Variable.get("render_host")
-    dbname = await Variable.get("render_dbname")
-    logger.info("�� Password loaded from Secret Manager")
+
+    # Variables (async, but return strings directly)
+    username = await Variable.aget("render_username")
+    host = await Variable.aget("render_host")
+    dbname = await Variable.aget("render_dbname")
+
+    logger.info("🔐 Password and variables loaded from Secret Manager")
     return password.get(), username, host, dbname
+
 
 @task(retries=3, retry_delay_seconds=5)
 def test_connection(DATABASE_URI):
